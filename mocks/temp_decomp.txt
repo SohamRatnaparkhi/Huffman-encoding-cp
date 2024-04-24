@@ -1,0 +1,5 @@
+The utility class Files in the java.nio.file package provides the following methods for reading and writing binary data:
+readAllBytes(Path path): reads all bytes from a file and returns an array of bytes. This method is intended for reading small files, not large ones.
+write(Path path, byte[] bytes, OpenOption... options): writes an array of bytes to a file with some useful options like CREATE, TRUNCATE_EXISTING, WRITE and APPEND.
+Note that both methods close the input and output file after done and throw IOException in case of error.
+Let￢ﾀﾙs see an example. The files copy program above can be re-written using NIO API like this:.

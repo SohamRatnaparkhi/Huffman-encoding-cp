@@ -1,9 +1,9 @@
 package cp.utils;
 
 public class FilePath {
-    String extension;
-    String fileName;
-    String path;
+    public String extension;
+    public String fileName;
+    public String path;
 
     public FilePath(String path) {
         this.path = path;

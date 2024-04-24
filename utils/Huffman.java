@@ -59,4 +59,25 @@ public class Huffman {
         }
         return huffCodeBytes;
     }
+
+    public byte[] decompress (HashMap<Byte, Integer> frequency, byte[] compressed) {
+        Tree root = buildTree(frequency);
+        StringBuilder strBuilder = new StringBuilder();
+        Tree current = root;
+        for (byte b : compressed) {
+            for (int i = 7; i >= 0; i--) {
+                int bit = (b >> i) & 1;
+                if (bit == 0)
+                    current = current.left;
+                else
+                    current = current.right;
+
+                if (current.data.data != null) {
+                    strBuilder.append((char) (current.data.data.intValue()));
+                    current = root;
+                }
+            }
+        }
+        return strBuilder.toString().getBytes();
+    }
 }

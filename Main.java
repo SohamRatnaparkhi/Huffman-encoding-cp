@@ -45,5 +45,15 @@ public class Main {
 
         // Write the compressed content to the destination file
         FileUtils.writeFile(destination, compressed);
+
+        // Read the compressed file
+        byte[] compressedContent = FileUtils.getFileBytes(destination);
+
+        // Decompress the compressed file
+        byte[] decompressed = huffman.decompress(frequency, compressedContent);
+
+        String newPathName = destination.path.substring(0, destination.path.lastIndexOf(".")) + "_decomp." + input.extension;
+        // Write the decompressed content to a new file
+        FileUtils.writeFile(new FilePath(newPathName), decompressed);
     }
 }

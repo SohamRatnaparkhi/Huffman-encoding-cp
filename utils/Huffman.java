@@ -1,5 +1,7 @@
 package cp.utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
@@ -8,7 +10,6 @@ public class Huffman {
     public HashMap<Byte, String> codes = new HashMap<Byte, String>();
     public Tree huffmanTree = null;
     int extraBits = 0;
-
 
     public Tree buildTree(HashMap<Byte, Integer> frequency) {
         for (Byte key : frequency.keySet()) {
@@ -39,67 +40,110 @@ public class Huffman {
 
     public void printCodes() {
         for (Byte key : codes.keySet()) {
-            System.out.println((char)key.byteValue() + ": " + codes.get(key));
+            System.out.println((char) key.byteValue() + ": " + codes.get(key));
         }
     }
 
-    public byte[] compress(byte[] bytes) {
-        StringBuilder strBuilder = new StringBuilder();
-        for (byte b : bytes)
-            strBuilder.append(codes.get(b));
+    public byte[] compress(byte[] bytes) throws IOException {
+        // StringBuilder strBuilder = new StringBuilder();
+        // for (byte b : bytes)
+        // strBuilder.append(codes.get(b));
 
-        // int actualBitLength = strBuilder.length();
+        // // int actualBitLength = strBuilder.length();
+        // this.extraBits = 0;
+
+        // // Pad the string with zeros if it's not a multiple of 8 bits
+        // while (strBuilder.length() % 8 != 0) {
+        // strBuilder.append('0');
+        // this.extraBits++;
+        // }
+
+        // int length = strBuilder.length() / 8;
+        // byte[] huffCodeBytes = new byte[length];
+        // int idx = 0;
+        // for (int i = 0; i < strBuilder.length(); i += 8) {
+        // String strByte = strBuilder.substring(i, i + 8);
+        // huffCodeBytes[idx++] = (byte) Integer.parseInt(strByte, 2);
+        // }
+
+        // return huffCodeBytes;
         this.extraBits = 0;
-
-        // Pad the string with zeros if it's not a multiple of 8 bits
-        while (strBuilder.length() % 8 != 0) {
-            strBuilder.append('0');
+        StringBuilder builder = new StringBuilder();
+        for (byte b : bytes) {
+            builder.append(codes.get(b));
+        }
+        while (builder.length() % 8 != 0) {
+            builder.append('0');
             this.extraBits++;
         }
-
-        int length = strBuilder.length() / 8;
-        byte[] huffCodeBytes = new byte[length];
-        int idx = 0;
-        for (int i = 0; i < strBuilder.length(); i += 8) {
-            String strByte = strBuilder.substring(i, i + 8);
-            huffCodeBytes[idx++] = (byte) Integer.parseInt(strByte, 2);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        BitOutputStream bitOutput = new BitOutputStream(output);
+        for (int i = 0; i < builder.length(); i++) {
+            if (builder.charAt(i) == '0') {
+                bitOutput.writeBit(0);
+            } else {
+                bitOutput.writeBit(1);
+            }
         }
-
-        return huffCodeBytes;
+        bitOutput.flush();
+        return output.toByteArray();
     }
 
-    public byte[] decompress (HashMap<Byte, Integer> frequency, byte[] compressed) {
-        // Tree root = buildTree(frequency);
-        Tree root = huffmanTree;
-        StringBuilder strBuilder = new StringBuilder();
-        Tree current = root;
+    // public byte[] decompress(HashMap<Byte, Integer> frequency, byte[] compressed) {
+    //     // Tree root = buildTree(frequency);
+    //     Tree root = huffmanTree;
+    //     StringBuilder strBuilder = new StringBuilder();
+    //     Tree current = root;
 
-        // Total number of bits to process
-        int totalBits = compressed.length * 8 - extraBits;
+    //     // Total number of bits to process
+    //     int totalBits = compressed.length * 8 - extraBits;
 
-        int bitCount = 0; // Counter to keep track of the number of bits processed
-        for (byte b : compressed) {
-            for (int i = 7; i >= 0; i--) {
-                if (bitCount == totalBits) {
-                    break; // Stop if we have processed all valid bits
-                }
+    //     int bitCount = 0; // Counter to keep track of the number of bits processed
+    //     for (byte b : compressed) {
+    //         for (int i = 7; i >= 0; i--) {
+    //             if (bitCount == totalBits) {
+    //                 break; // Stop if we have processed all valid bits
+    //             }
 
-                int bit = (b >> i) & 1;
-                if (bit == 0)
-                    current = current.left;
-                else
-                    current = current.right;
+    //             int bit = (b >> i) & 1;
+    //             if (bit == 0)
+    //                 current = current.left;
+    //             else
+    //                 current = current.right;
 
-                if (current.data != null && current.data.data != null) {
-                    strBuilder.append((char) (current.data.data.intValue()));
-                    current = root; // Reset to start of tree for next character
-                }
-                bitCount++;
+    //             if (current.data != null && current.data.data != null) {
+    //                 strBuilder.append((char) (current.data.data.intValue()));
+    //                 current = root; // Reset to start of tree for next character
+    //             }
+    //             bitCount++;
+    //         }
+    //     }
+
+    //     System.out.println(strBuilder.toString());
+    //     return strBuilder.toString().getBytes();
+    // }
+
+    public byte[] decompress(byte[] compressed) throws IOException {
+        BitInputStream bitInput = new BitInputStream(compressed);
+        ByteArrayOutputStream decompressedOutput = new ByteArrayOutputStream();
+        Tree currentNode = huffmanTree; // Assume huffmanTree is the root of your Huffman tree
+        int bitsToRead = compressed.length * 8 - extraBits;
+        int bit;
+        while (bitsToRead >= 0 && (bit = bitInput.readBit()) != -1) {
+            if (bit == 0) {
+                currentNode = currentNode.left;
+            } else {
+                currentNode = currentNode.right;
+            }
+            bitsToRead--;
+            if (currentNode.data != null && currentNode.data.data != null) {
+                decompressedOutput.write(currentNode.data.data.intValue()); // 'data' should be the original byte value
+                currentNode = huffmanTree; // Reset to start of Huffman tree
             }
         }
 
-        System.out.println(strBuilder.toString());
-        return strBuilder.toString().getBytes();
+        bitInput.close();
+        return decompressedOutput.toByteArray();
     }
 
     public static void printTree(Tree node, int level) {

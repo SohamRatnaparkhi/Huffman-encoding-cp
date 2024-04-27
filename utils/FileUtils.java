@@ -82,16 +82,7 @@ public class FileUtils {
         return frequency;
     }
 
-    public static void writeFile(FilePath path, byte[] data) throws IOException {
-        // write file in the form of bits and not string
-        // String pathWithExt = path.path;
-        // File file = new File(pathWithExt);
-        // try {
-        //     file.createNewFile();
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
-        // Files.write(Paths.get(pathWithExt), data);     
+    public static void writeFile(FilePath path, byte[] data) throws IOException {   
         try (FileOutputStream fos = new FileOutputStream(path.path)) {
             fos.write(data);
         } catch (IOException e) {

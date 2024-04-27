@@ -1,7 +1,5 @@
 package cp.utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
@@ -45,24 +43,30 @@ public class Huffman {
         }
     }
 
-    public byte[] compress(byte[] bytes) throws IOException {
-        StringBuilder builder = new StringBuilder();
-        for (byte b : bytes) {
-            builder.append(codes.get(b));
-        }
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        BitOutputStream bitOutput = new BitOutputStream(output);
-        for (int i = 0; i < builder.length(); i++) {
-            if (builder.charAt(i) == '0') {
-                bitOutput.writeBit(0);
-            } else {
-                bitOutput.writeBit(1);
-            }
-        }
-        bitOutput.flush();
-        return output.toByteArray();
-    }
+    public byte[] compress(byte[] bytes) {
+        StringBuilder strBuilder = new StringBuilder();
+        for (byte b : bytes)
+            strBuilder.append(codes.get(b));
 
+        // int actualBitLength = strBuilder.length();
+        this.extraBits = 0;
+
+        // Pad the string with zeros if it's not a multiple of 8 bits
+        while (strBuilder.length() % 8 != 0) {
+            strBuilder.append('0');
+            this.extraBits++;
+        }
+
+        int length = strBuilder.length() / 8;
+        byte[] huffCodeBytes = new byte[length];
+        int idx = 0;
+        for (int i = 0; i < strBuilder.length(); i += 8) {
+            String strByte = strBuilder.substring(i, i + 8);
+            huffCodeBytes[idx++] = (byte) Integer.parseInt(strByte, 2);
+        }
+
+        return huffCodeBytes;
+    }
 
     public byte[] decompress (HashMap<Byte, Integer> frequency, byte[] compressed) {
         // Tree root = buildTree(frequency);

@@ -31,6 +31,17 @@ public class FileUtils {
             return null;
         }        
     }
+    
+    public static void createFolder(String path) {
+        File file = new File(path);
+        if (!file.exists()) {
+            if (file.mkdir()) {
+                System.out.println("Directory is created!");
+            } else {
+                System.out.println("Failed to create directory!");
+            }
+        }
+    } 
 
     public static byte[] getFileBytes(FilePath path) throws IOException {
         FileInputStream inStream = new FileInputStream(path.path);
@@ -90,13 +101,13 @@ public class FileUtils {
 
     public static void writeFileInString(FilePath path, String data) throws IOException {
         // write file in the form of bits and not string
-        String pathWithExt = path.path + "_codes.txt";
-        File file = new File(pathWithExt);
+        // String pathWithExt = path.path + "_codes.txt";
+        File file = new File(path.path);
         try {
             file.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Files.write(Paths.get(pathWithExt), data.getBytes());
+        Files.write(Paths.get(path.path), data.getBytes());
     }
 }

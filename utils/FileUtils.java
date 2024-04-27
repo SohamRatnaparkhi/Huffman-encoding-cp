@@ -5,6 +5,7 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -72,14 +73,19 @@ public class FileUtils {
 
     public static void writeFile(FilePath path, byte[] data) throws IOException {
         // write file in the form of bits and not string
-        String pathWithExt = path.path;
-        File file = new File(pathWithExt);
-        try {
-            file.createNewFile();
+        // String pathWithExt = path.path;
+        // File file = new File(pathWithExt);
+        // try {
+        //     file.createNewFile();
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
+        // Files.write(Paths.get(pathWithExt), data);     
+        try (FileOutputStream fos = new FileOutputStream(path.path)) {
+            fos.write(data);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Files.write(Paths.get(pathWithExt), data);     
     }
 
     public static void writeFileInString(FilePath path, String data) throws IOException {

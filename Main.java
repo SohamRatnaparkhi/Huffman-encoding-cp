@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Scanner;
 
+import cp.utils.BTreePrinter;
 import cp.utils.FilePath;
 import cp.utils.FileUtils;
 import cp.utils.Huffman;
@@ -31,14 +32,19 @@ public class Main {
 
         // Get the frequency of each byte in the file
         HashMap<Byte, Integer> frequency = FileUtils.getFileByteFrequency(input);
-        System.out.println(frequency);
+        for (Byte key : frequency.keySet()) {
+            System.out.println((char)key.byteValue() + ": " + frequency.get(key));
+        }
+        // System.out.println(frequency);
         FileUtils.writeFileInString(input, frequency.toString());
 
         Huffman huffman = new Huffman();
         Tree tree = huffman.buildTree(frequency);
         huffman.generateCodes(tree, "");
         
-        // huffman.printCodes();
+        huffman.printCodes();
+        // Huffman.printTree(tree, 0);
+        BTreePrinter.printNode(tree);
 
         byte[] compressed = huffman.compress(contentInBytes);
         // System.out.println(new String(compressed));

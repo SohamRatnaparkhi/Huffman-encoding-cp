@@ -10,5 +10,10 @@ public class Tree {
         this.right = null;
         this.left = null;
     }
+
+    @Override
+    public String toString() {
+        return data.toString();
+    }    
 }
 

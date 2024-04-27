@@ -8,4 +8,9 @@ public class Data {
         this.data = data;
         this.frequency = frequency;
     }
+
+    @Override
+    public String toString() {
+        return data == null ? frequency + "" : (char)data.byteValue() + "";
+    }
 }

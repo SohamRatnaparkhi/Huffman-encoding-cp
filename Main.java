@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import cp.utils.BTreePrinter;
 import cp.utils.FilePath;
 import cp.utils.FileUtils;
 import cp.utils.Huffman;
@@ -34,18 +33,18 @@ public class Main {
 
         // Get the frequency of each byte in the file
         HashMap<Byte, Integer> frequency = FileUtils.getFileByteFrequency(input);
-        for (Byte key : frequency.keySet()) {
-            System.out.println((char)key.byteValue() + ": " + frequency.get(key));
-        }
+        // for (Byte key : frequency.keySet()) {
+        //     System.out.println((char)key.byteValue() + ": " + frequency.get(key));
+        // }
         // System.out.println(frequency);
         
         Huffman huffman = new Huffman();
         Tree tree = huffman.buildTree(frequency);
         huffman.generateCodes(tree, "");
         
-        huffman.printCodes();
+        // huffman.printCodes();
         // Huffman.printTree(tree, 0);
-        BTreePrinter.printNode(tree);
+        // BTreePrinter.printNode(tree);
         
         byte[] compressed = huffman.compress(contentInBytes);
         // System.out.println(new String(compressed));
@@ -66,7 +65,8 @@ public class Main {
                 destinationFolder + "/" + input.fileName + "_compressed_codes." + "txt"), frequency.toString());
         
         // Decompress the compressed file
-        byte[] decompressed = huffman.decompress(frequency, compressedContent);
+        // byte[] decompressed = huffman.decompress(frequency, compressedContent);
+        byte[] decompressed = huffman.decompress(compressedContent);
 
         String newPathName = destinationFolder + '/' + input.fileName + "_decomp." + input.extension;
         // Write the decompressed content to a new file
